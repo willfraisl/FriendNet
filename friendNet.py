@@ -15,10 +15,79 @@ a sum of money. That money will bump you up on someone’s list by a certain amo
 Killer feature #2: Find the best group of friends
 Enter a size of group, we will find the closest group of friends of this size. 
 Everyone in the group has to be friends with each other. 
-
 '''
 
 import csv
+
+
+def best_friend_group(graph, group_size):
+    poss_groups = generate_groups(graph, group_size)
+    valid_groups = []
+    for group in poss_groups:
+        if is_valid_group(graph, group):
+            valid_groups.append(group)
+
+    best_group = []
+    best_score = 0
+    for group in valid_groups:
+        curr_score = 0
+        for i, user in enumerate(group):
+            for friend in group[:i] + group[i+1:]:
+                for other_friend, score in graph[user]:
+                    if friend == other_friend:
+                        curr_score += score
+        if curr_score > best_score:
+            best_score = curr_score
+            best_group = group
+
+    return best_group
+
+
+def generate_groups(graph, group_size):
+    users = graph.keys()
+    groups = []
+    return groups
+
+
+def is_valid_group(graph, group):
+    for i, user in enumerate(group):
+        for other_friend in group[:i] + group[i+1:]:
+            # needs to look at first element of tuples
+            if other_friend not in graph[user]:
+                return False
+    return True
+
+
+def pay_to_win(graph, name, money):
+    # rating_avg = {}
+    # for user in graph:
+    #     # Verify that this order is right... you want the name to be the requester
+    #     if get_connection(graph, user, name) != 0 and get_connection(graph, user, name) != 0:
+    #         sum_values = 0
+    #         num = 0
+    #         for names in graph[user]:
+    #             sum_values += names[1]
+    #             num += 1
+    #         rating_avg[user] = sum_values/num
+    # requester_eval = {}
+    # differences = {}
+    # for person in rating_avg:
+    #     # avg is now the key name
+    #     requester_eval[person] = get_connection(graph, person, name)
+    #     temp_diff = rating_avg[person] - requester_eval[person]
+    #     if temp_diff >= 0:
+    #         differences[person] = temp_diff
+
+    # max_diff_key = max(differences.keys(), key=(lambda k: differences[k]))
+    pass
+
+
+def best_friend_chain(graph, name1, name2):
+    result = dijkstra(graph, name1, name2)
+    if result == []:
+        print('No path to connect these people.')
+    else:
+        print('The best friend chain is', ', '.join(result))
 
 
 def user_exists(graph, user):
@@ -45,7 +114,7 @@ def read_friends(file_name):
     with open(file_name) as f:
         data_list = f.readlines()
 
-    for line in data_list:
+    for i, line in enumerate(data_list):
         temp = line.split()
         friend_list = graph.get(temp[0], [])
         friend_list.append((temp[1], int(temp[2])))
@@ -76,10 +145,73 @@ def menu_interface(graph):
             break
 
 
+def dijkstra(graph, source, destination):
+    inf = float("inf")
+    Q = set()
+    dist = {}
+    prev = {}
+    for vertex in graph.keys():
+        dist[vertex] = inf
+        prev[vertex] = None
+        Q.add(vertex)
+    dist[source] = 0
+
+    while len(Q) > 0:
+        smallest = inf
+        smallest_node = Q
+        for node in Q:
+            print(node, dist[node], smallest)
+            if dist[node] <= smallest:
+                smallest = dist[node]
+                smallest_node = node
+        u = smallest_node
+
+        Q.remove(u)
+
+        for v, weight in graph[u]:
+            alt = dist[u] + 10 - weight
+            if alt < dist[v]:
+                dist[v] = alt
+                prev[v] = u
+
+    u = destination
+    path = []
+    if(prev[u] != None or u == source):
+        while(u):
+            path.insert(0, u)
+            u = prev[u]
+    return path
+
+
+def getCostMatrix(graph, IDDict):
+    inf = float("inf")
+    matrix = [[]]*len(IDDict)
+    print(matrix)
+    for item in graph.keys():
+        print(item, getID(item, IDDict))
+        matrix[getID(item, IDDict)] = ([inf]*len(IDDict))
+        for value in graph.get(item):
+            print(value, getID(value[0], IDDict))
+            matrix[getID(item, IDDict)][getID(value[0], IDDict)] = 10-value[1]
+    return matrix
+
+
+def createIDDict(graph):
+    IDDict = {}
+    for i, key in enumerate(graph.keys()):
+        IDDict.update({key: i})
+    return IDDict
+
+
+def getID(name, IDDict):
+    return IDDict.get(name)
+
+
 def main():
     graph = read_friends("friendNet.txt")
     print_dictionary(graph)
-    menu_interface(graph)
+    best_friend_chain(graph, 'Coe', 'Tony')
+    # menu_interface(graph)
 
 
 if __name__ == '__main__':
