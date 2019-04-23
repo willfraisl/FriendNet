@@ -58,28 +58,51 @@ def is_valid_group(graph, group):
     return True
 
 
-def pay_to_win(graph, name, money):
-    # rating_avg = {}
-    # for user in graph:
-    #     # Verify that this order is right... you want the name to be the requester
-    #     if get_connection(graph, user, name) != 0 and get_connection(graph, user, name) != 0:
-    #         sum_values = 0
-    #         num = 0
-    #         for names in graph[user]:
-    #             sum_values += names[1]
-    #             num += 1
-    #         rating_avg[user] = sum_values/num
-    # requester_eval = {}
-    # differences = {}
-    # for person in rating_avg:
-    #     # avg is now the key name
-    #     requester_eval[person] = get_connection(graph, person, name)
-    #     temp_diff = rating_avg[person] - requester_eval[person]
-    #     if temp_diff >= 0:
-    #         differences[person] = temp_diff
+def pay_to_win(graph):
+    name = ''
+    while True:
+        print('Please enter your name:')
+        name = input('> ')
+        #name = 'Emma'
+        if user_exists(graph, name):
+            print(f"You have chosen {name}")
+            break
+        print("This user does not exist! Try again!")
 
-    # max_diff_key = max(differences.keys(), key=(lambda k: differences[k]))
-    pass
+    rating_avg = {}
+    for user in graph:
+        # Verify that this order is right... you want the name to be the requester
+        if get_connection(graph, user, name) != 0 and get_connection(graph, user, name) != 0:     
+            sum_values = 0
+            num = 0
+            for names in graph[user]:
+                sum_values += names[1]
+                num += 1
+            rating_avg[user] = sum_values/num
+
+    requester_eval = {}
+    differences = {}
+    for person in rating_avg:
+        # person is now the key name
+        requester_eval[person] = get_connection(graph, person, name)
+        temp_diff = rating_avg[person] - requester_eval[person]
+        if temp_diff >= 0:
+            differences[person] = temp_diff
+
+    max_diff_key = max(differences.keys(), key=(lambda k: differences[k]))
+    #print(max_diff_key)
+    print(f"The biggest difference between you and how {max_diff_key} rates you is {differences[max_diff_key]}")
+    print("Right now we have great deal you may want to consider! For each point you are differently rated, you can pay $1 to change that!")
+    print("Enter how much you want to bump up your rating (0 for none, you can't go more than you are at a deficit):")
+    inp = 0
+    while True:
+        try:
+            inp = int(input('> '))
+            break
+        except ValueError:
+            print("The input was either invalid or too high. Try again!")
+    print(graph[max_diff_key])
+    print(f"Ok! You increased your friendship by {inp}")
 
 
 def best_friend_chain(graph, name1, name2):
@@ -127,7 +150,8 @@ def menu_interface(graph):
         print('\nWhat do you want to do?')
         print('1) Check if user exists')
         print('2) Check connection between users')
-        print('3) Quit')
+        print('3) Pay to increase your status')
+        print('4) Quit')
         inp = input('> ')
         if inp == '1':
             user = input('What user? ')
@@ -141,6 +165,8 @@ def menu_interface(graph):
             weight = get_connection(graph, names[0], names[1])
             print('The connection from',
                   names[0], 'to', names[1], 'has weight', weight)
+        elif inp == '3':
+            pay_to_win(graph)
         else:
             break
 
@@ -211,7 +237,7 @@ def main():
     graph = read_friends("friendNet.txt")
     print_dictionary(graph)
     best_friend_chain(graph, 'Coe', 'Tony')
-    # menu_interface(graph)
+    #menu_interface(graph)
 
 
 if __name__ == '__main__':
