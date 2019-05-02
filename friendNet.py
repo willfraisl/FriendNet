@@ -18,7 +18,7 @@ Everyone in the group has to be friends with each other.
 '''
 
 import csv
-
+import copy
 
 def best_friend_group(graph, group_size):
     poss_groups = generate_groups(graph, group_size)
@@ -40,15 +40,8 @@ def best_friend_group(graph, group_size):
             best_score = curr_score
             best_group = group
 
-    return best_group
-
-
-def generate_groups(graph, group_size):
-    users = graph.keys()
-    groups = []
-    return groups
-
-
+    return best_group      
+    
 def is_valid_group(graph, group):
     for i, user in enumerate(group):
         for other_friend in group[:i] + group[i+1:]:
@@ -233,11 +226,43 @@ def getID(name, IDDict):
     return IDDict.get(name)
 
 
+def generate_groups(graph, group_size):
+    users = graph.keys()
+
+    groups = []
+    return groups
+
+   
+def generate_groups_helper(graph,groupSize):
+    users = list(graph.keys())
+    group = list(range(3))
+    return generate_groups(users,groupSize,0,group,0,[])
+
+def generate_groups(users,groupSize,groupIndex,data,userIndex,groupsList): 
+    # add filled group to the list 
+    if(groupIndex == groupSize): 
+        groupsList.append(copy.deepcopy(data))
+        return groupsList
+  
+    # don't exceed group size
+    if(userIndex >= len(users)): 
+        return groupsList
+  
+    # add current person to group and recurse  
+    data[groupIndex] = users[userIndex]
+    generate_groups(users, groupSize, groupIndex + 1, data, userIndex + 1,groupsList) 
+      
+    # move to next person and recurse
+    generate_groups(users, groupSize, groupIndex, data, userIndex + 1,groupsList)
+
+    return groupsList
+
 def main():
     graph = read_friends("friendNet.txt")
-    print_dictionary(graph)
-    best_friend_chain(graph, 'Coe', 'Tony')
+    #print_dictionary(graph)
+    #best_friend_chain(graph, 'Coe', 'Tony')
     #menu_interface(graph)
+    print(generate_groups_helper(graph,3))
 
 
 if __name__ == '__main__':
