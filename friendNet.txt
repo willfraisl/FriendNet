@@ -4,10 +4,11 @@ Roland Lilith 5
 Lilith Roland 8
 Scooter Daisy 9
 Daisy Scooter 1
-Will Emma 3
+Will Emma 6
 Emma Erik 10
-Erik Will 10
+Erik Will 9
 Will Erik 10
+Erik Emma 8
 Ana Emma 9
 Emma Ana 10
 Emma Maren 7
@@ -20,8 +21,8 @@ Freddie Olivia 5
 Emma Tony 1
 Tony Erik 7
 Erik David 10
-Will David 10
+David Erik 10
+Will David 2
 Emma David 4
 David Erik 5
-David Will 7
 David Emma 2

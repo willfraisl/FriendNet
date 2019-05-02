@@ -20,8 +20,9 @@ Everyone in the group has to be friends with each other.
 import csv
 import copy
 
+
 def best_friend_group(graph, group_size):
-    poss_groups = generate_groups(graph, group_size)
+    poss_groups = generate_groups_helper(graph, group_size)
     valid_groups = []
     for group in poss_groups:
         if is_valid_group(graph, group):
@@ -36,17 +37,19 @@ def best_friend_group(graph, group_size):
                 for other_friend, score in graph[user]:
                     if friend == other_friend:
                         curr_score += score
-        if curr_score > best_score:
+        if curr_score >= best_score:
             best_score = curr_score
             best_group = group
 
-    return best_group      
-    
+    return best_group
+
+
 def is_valid_group(graph, group):
     for i, user in enumerate(group):
+        user_friends = [tup[0] for tup in graph[user]]
         for other_friend in group[:i] + group[i+1:]:
             # needs to look at first element of tuples
-            if other_friend not in graph[user]:
+            if other_friend not in user_friends:
                 return False
     return True
 
@@ -65,7 +68,7 @@ def pay_to_win(graph):
     rating_avg = {}
     for user in graph:
         # Verify that this order is right... you want the name to be the requester
-        if get_connection(graph, user, name) != 0 and get_connection(graph, user, name) != 0:     
+        if get_connection(graph, user, name) != 0 and get_connection(graph, user, name) != 0:
             sum_values = 0
             num = 0
             for names in graph[user]:
@@ -83,8 +86,9 @@ def pay_to_win(graph):
             differences[person] = temp_diff
 
     max_diff_key = max(differences.keys(), key=(lambda k: differences[k]))
-    #print(max_diff_key)
-    print(f"The biggest difference between you and how {max_diff_key} rates you is {differences[max_diff_key]}")
+    # print(max_diff_key)
+    print(
+        f"The biggest difference between you and how {max_diff_key} rates you is {differences[max_diff_key]}")
     print("Right now we have great deal you may want to consider! For each point you are differently rated, you can pay $1 to change that!")
     print("Enter how much you want to bump up your rating (0 for none, you can't go more than you are at a deficit):")
     inp = 0
@@ -144,7 +148,8 @@ def menu_interface(graph):
         print('1) Check if user exists')
         print('2) Check connection between users')
         print('3) Pay to increase your status')
-        print('4) Quit')
+        print('4) Find best friend group')
+        print('5) Quit')
         inp = input('> ')
         if inp == '1':
             user = input('What user? ')
@@ -160,6 +165,13 @@ def menu_interface(graph):
                   names[0], 'to', names[1], 'has weight', weight)
         elif inp == '3':
             pay_to_win(graph)
+        elif inp == '4':
+            size = int(input('What group size? '))
+            group = best_friend_group(graph, size)
+            if group == []:
+                print('No friend groups of that size')
+            else:
+                print('Best friend group is', ' '.join(group))
         else:
             break
 
@@ -226,43 +238,38 @@ def getID(name, IDDict):
     return IDDict.get(name)
 
 
-def generate_groups(graph, group_size):
-    users = graph.keys()
-
-    groups = []
-    return groups
-
-   
-def generate_groups_helper(graph,groupSize):
+def generate_groups_helper(graph, groupSize):
     users = list(graph.keys())
-    group = list(range(3))
-    return generate_groups(users,groupSize,0,group,0,[])
+    group = list(range(groupSize))
+    return generate_groups(users, groupSize, 0, group, 0, [])
 
-def generate_groups(users,groupSize,groupIndex,data,userIndex,groupsList): 
-    # add filled group to the list 
-    if(groupIndex == groupSize): 
+
+def generate_groups(users, groupSize, groupIndex, data, userIndex, groupsList):
+    # add filled group to the list
+    if(groupIndex == groupSize):
         groupsList.append(copy.deepcopy(data))
         return groupsList
-  
+
     # don't exceed group size
-    if(userIndex >= len(users)): 
+    if(userIndex >= len(users)):
         return groupsList
-  
-    # add current person to group and recurse  
+
+    # add current person to group and recurse
     data[groupIndex] = users[userIndex]
-    generate_groups(users, groupSize, groupIndex + 1, data, userIndex + 1,groupsList) 
-      
+    generate_groups(users, groupSize, groupIndex + 1,
+                    data, userIndex + 1, groupsList)
+
     # move to next person and recurse
-    generate_groups(users, groupSize, groupIndex, data, userIndex + 1,groupsList)
+    generate_groups(users, groupSize, groupIndex,
+                    data, userIndex + 1, groupsList)
 
     return groupsList
 
+
 def main():
     graph = read_friends("friendNet.txt")
-    #print_dictionary(graph)
-    #best_friend_chain(graph, 'Coe', 'Tony')
-    #menu_interface(graph)
-    print(generate_groups_helper(graph,3))
+    print_dictionary(graph)
+    menu_interface(graph)
 
 
 if __name__ == '__main__':
