@@ -24,5 +24,4 @@ Erik David 10
 David Erik 10
 Will David 2
 Emma David 4
-David Erik 5
 David Emma 2

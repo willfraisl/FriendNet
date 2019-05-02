@@ -145,27 +145,30 @@ def read_friends(file_name):
 def menu_interface(graph):
     while(True):
         print('\nWhat do you want to do?')
-        print('1) Check if user exists')
-        print('2) Check connection between users')
-        print('3) Pay to increase your status')
-        print('4) Find best friend group')
-        print('5) Quit')
+        print('1) Print adjacency list')
+        print('2) Check if user exists')
+        print('3) Check connection between users')
+        print('4) Pay to increase your status')
+        print('5) Find best friend group')
+        print('6) Quit')
         inp = input('> ')
         if inp == '1':
+            print_dictionary(graph)
+        elif inp == '2':
             user = input('What user? ')
             if user_exists(graph, user):
                 print(user, 'does exist.')
             else:
                 print(user, 'does not exist.')
-        elif inp == '2':
+        elif inp == '3':
             names = input('What users (separated by spaces)? ')
             names = names.split(' ')
             weight = get_connection(graph, names[0], names[1])
             print('The connection from',
                   names[0], 'to', names[1], 'has weight', weight)
-        elif inp == '3':
-            pay_to_win(graph)
         elif inp == '4':
+            pay_to_win(graph)
+        elif inp == '5':
             size = int(input('What group size? '))
             group = best_friend_group(graph, size)
             if group == []:
@@ -268,7 +271,6 @@ def generate_groups(users, groupSize, groupIndex, data, userIndex, groupsList):
 
 def main():
     graph = read_friends("friendNet.txt")
-    print_dictionary(graph)
     menu_interface(graph)
 
 
